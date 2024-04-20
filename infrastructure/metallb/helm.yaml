@@ -1,0 +1,40 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: metallb
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  url: https://metallb.github.io/metallb
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: metallb
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: metallb
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: metallb
+      version: 0.13.10
+  interval: 1m0s
+  releaseName: metallb
+  targetNamespace: metallb-system
+  values:
+    prometheus:
+      podMonitor:
+        enabled: false
+      prometheusRule:
+        enabled: true
+      rbacPrometheus: false
+      serviceMonitor:
+        enabled: true
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
